@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, send_file, jsonify
+from flask_cors import CORS # 1. Import CORS
 from werkzeug.utils import secure_filename
 import os
 import torch
@@ -7,7 +8,10 @@ from PIL import Image
 import io
 
 app = Flask(__name__)
+CORS(app) # 2. Enable CORS for the entire application
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
+# ... (rest of the config remains the same)
 app.config['OUTPUT_FOLDER'] = 'outputs'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'bmp'}
@@ -34,7 +38,14 @@ def init_model():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # This route is not used by your main app, but we'll leave it.
+    # The TemplateNotFound error you saw before is because this file is missing.
+    # It does not affect the API functionality.
+    try:
+        return render_template('index.html')
+    except:
+        return "AI Enhancer API is running."
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -87,4 +98,5 @@ def view_file(filename):
 
 if __name__ == '__main__':
     init_model()
+    # 3. For local testing, we run with debug. Gunicorn will handle production.
     app.run(debug=True, host='0.0.0.0', port=5000)
